@@ -8,6 +8,8 @@ This repository accompanies two tutorial series published on the Siemens Simcent
 
 `search_api` finds a class, interface, method or field by name in the Javadoc search index and returns the path to its page. `get_doc` returns that page as plain text: the class description and the Method Summary with exact signatures and any Deprecated tag. The AI asks, reads, then writes. Nothing is recited from memory.
 
+**Limitation.** Members are listed only under the class that declares them, not under subclasses that inherit them, so a missing subclass in the results does not mean the method is unavailable there; `get_doc` on the subclass page lists its inherited members and their declaring classes. Measured on STAR-CCM+ 2606, 267 of 794 API calls (33.6 %) in 10 GUI recordings and 5 generated macros use a method that `search_api` does not list under the receiver's class ([issue #1](https://github.com/pacoEzq/starccm-javadoc-mcp/issues/1)). Indexing inherited members is tracked in [issue #2](https://github.com/pacoEzq/starccm-javadoc-mcp/issues/2).
+
 The Javadoc itself is not in this repository and never will be. It is Siemens documentation that ships with STAR-CCM+; the server reads it from a folder on your machine.
 
 ## Requirements

@@ -127,7 +127,10 @@ server.registerTool(
       "Search the STAR-CCM+ Java API (Javadoc) for classes/interfaces and methods/fields by name. " +
       "Use this to find the correct class or method when writing STAR-CCM+ Java macros. " +
       "Returns each match with its package, declaring class (for members) and the relative path to its HTML doc page " +
-      "(pass that path to get_doc to read the full signatures and descriptions).",
+      "(pass that path to get_doc to read the full signatures and descriptions). " +
+      "Members are listed only under the class that declares them, not under subclasses that inherit them, " +
+      "so a missing subclass in the results does not mean the method is unavailable there; " +
+      "get_doc on the subclass page lists its inherited members and their declaring classes.",
     inputSchema: {
       query: z.string().describe("Text to look for in class or member names, e.g. 'Simulation' or 'getRegionManager'"),
       kind: z.enum(["type", "member", "all"]).optional().describe("Restrict to types, members, or both (default: all)"),
