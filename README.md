@@ -75,9 +75,11 @@ Every instrument that publishes a figure checks the STAR-CCM+ version and the Ja
 5. [Audit a Macro for Invented and Deprecated Calls](https://community.sw.siemens.com/s/question/0D5Vb00001MkZ4UKAV/simcenter-starccm-macros-with-ai-56-audit-a-macro-for-invented-deprecated-calls)
 6. [Stress-Test a Grounded Macro Against a Recording](https://community.sw.siemens.com/s/question/0D5Vb00001NKFrkKAH/simcenter-starccm-macros-with-ai-66-stresstest-a-grounded-macro-against-a-recording)
 
-**Simcenter STAR-CCM+ Agentic Macros** (7 parts, in preparation). Adds a compile loop, a batch runner and the token economy work whose "before" numbers are the table above. Each part will land here as a tag.
+**Simcenter STAR-CCM+ Agentic Macros** (7 parts, 1 published). Adds a compile loop, a batch runner and the token economy work whose "before" numbers are the table above. Each part lands here as a tag.
 
-Tags: `series1` marks the tree that corresponds to Part 2 of the first series.
+1. [Compile by Hand, Read the Real Errors](https://community.sw.siemens.com/s/question/0D5Vb00001gGHQnKAO/simcenter-starccm-agentic-macros-17-compile-by-hand-read-the-real-errors)
+
+Tags: `series1` marks the tree that corresponds to Part 2 of the first series; `agentic1` marks the tree that Part 1 of the second series links to.
 
 ## Related
 

@@ -16,4 +16,4 @@ A defect was recorded against this macro when it was first written: the drag com
 
 ## Citation
 
-No published post cites this macro. It was drafted as a third test for the final part of the first series and left out when that part was redesigned, held back as a possible appendix on physical failure in the Agentic Macros series. The index row therefore reads `none (reserved, Agentic Macros)`, and the reservation is recorded in the project coordination file as the contract requires.
+Cited by [Agentic Macros, Part 1](https://community.sw.siemens.com/s/question/0D5Vb00001gGHQnKAO/simcenter-starccm-agentic-macros-17-compile-by-hand-read-the-real-errors), which opens the second series with this macro and `wall-yplus-audit`. It was drafted as a third test for the final part of the first series and left out when that part was redesigned, then held back for Agentic Macros; the index row read `none (reserved, Agentic Macros)` until that part was published.
