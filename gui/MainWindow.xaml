@@ -1,0 +1,137 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Name="MainWindow" Title="STAR-CCM+ · Codex 文档助手" Width="1100" Height="850" MinWidth="920" MinHeight="680"
+        WindowStartupLocation="CenterScreen" Background="#F4F6F8" FontFamily="Microsoft YaHei UI" FontSize="13">
+  <Window.Resources>
+    <SolidColorBrush x:Key="Ink" Color="#172B3A"/>
+    <SolidColorBrush x:Key="Muted" Color="#647686"/>
+    <SolidColorBrush x:Key="Accent" Color="#007F79"/>
+    <Style TargetType="Button">
+      <Setter Property="Padding" Value="15,9"/><Setter Property="Background" Value="White"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="BorderBrush" Value="#CED8DE"/>
+      <Setter Property="BorderThickness" Value="1"/><Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
+        <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+          <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+        <ControlTemplate.Triggers>
+          <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ButtonBorder" Property="Opacity" Value="0.82"/></Trigger>
+          <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ButtonBorder" Property="Opacity" Value="0.38"/></Trigger>
+        </ControlTemplate.Triggers>
+      </ControlTemplate></Setter.Value></Setter>
+    </Style>
+    <Style x:Key="Primary" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+      <Setter Property="Background" Value="{StaticResource Accent}"/><Setter Property="Foreground" Value="White"/><Setter Property="BorderBrush" Value="{StaticResource Accent}"/>
+    </Style>
+    <Style TargetType="TextBox">
+      <Setter Property="Padding" Value="9,7"/><Setter Property="BorderBrush" Value="#CED8DE"/>
+      <Setter Property="Foreground" Value="{StaticResource Ink}"/><Setter Property="VerticalContentAlignment" Value="Center"/>
+    </Style>
+    <Style x:Key="Caption" TargetType="TextBlock"><Setter Property="Foreground" Value="{StaticResource Muted}"/><Setter Property="FontSize" Value="12"/></Style>
+    <Style TargetType="DataGridColumnHeader">
+      <Setter Property="Background" Value="#F0F4F6"/><Setter Property="Foreground" Value="#536778"/>
+      <Setter Property="Padding" Value="12,9"/><Setter Property="BorderThickness" Value="0"/>
+    </Style>
+    <Style TargetType="DataGridCell"><Setter Property="Padding" Value="10,6"/><Setter Property="BorderThickness" Value="0"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+  </Window.Resources>
+  <Grid Margin="26,22,26,18">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <Grid Grid.Row="0" Margin="0,0,0,18">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+      <StackPanel>
+        <TextBlock Text="STAR-CCM+  /  CODEX" Foreground="#007F79" FontSize="12" FontWeight="SemiBold"/>
+        <TextBlock x:Name="Headline" Text="本地 API 文档，一键接入" Foreground="{StaticResource Ink}" FontSize="27" FontWeight="SemiBold" Margin="0,5,0,5" TextWrapping="Wrap"/>
+        <TextBlock x:Name="Subtitle" Text="查找你的 Javadoc，验证连接，让 Codex 根据真实文档编写宏。" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+      </StackPanel>
+      <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Top" Margin="10,4,0,0">
+        <Button x:Name="LanguageButton" Content="English" ToolTip="切换界面语言" Margin="0,0,8,0"/>
+        <Button x:Name="HelpButton" Content="使用说明 ↗"/>
+      </StackPanel>
+    </Grid>
+    <Border Grid.Row="1" Background="#EAF2F1" CornerRadius="8" Padding="16,12" Margin="0,0,0,14">
+      <Grid>
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel><TextBlock Text="NODE.JS" Style="{StaticResource Caption}"/><TextBlock x:Name="NodeStatus" Text="正在检查…" Foreground="{StaticResource Ink}" FontWeight="SemiBold" Margin="0,4,0,0"/></StackPanel>
+        <StackPanel Grid.Column="1"><TextBlock Text="CODEX" Style="{StaticResource Caption}"/><TextBlock x:Name="CodexStatus" Text="正在检查…" Foreground="{StaticResource Ink}" FontWeight="SemiBold" Margin="0,4,0,0"/></StackPanel>
+        <Button Grid.Column="2" x:Name="EnvironmentButton" Content="刷新环境" Padding="12,7"/>
+      </Grid>
+    </Border>
+    <ScrollViewer Grid.Row="2" x:Name="BodyScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <Border Background="White" CornerRadius="10" BorderBrush="#E0E7EB" BorderThickness="1" Padding="20,16">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+          <RowDefinition Height="160"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="ScanHeading" Text="01   查找文档" Foreground="{StaticResource Ink}" FontWeight="SemiBold" FontSize="15"/>
+        <Grid Grid.Row="1" Margin="0,12,0,8">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <TextBox x:Name="SourceBox" ToolTip="留空扫描常见安装位置，或输入安装目录、HTML 文档目录、ZIP/JAR 路径。"/>
+          <Button Grid.Column="1" x:Name="FolderButton" Content="文件夹…" Margin="8,0,0,0"/>
+          <Button Grid.Column="2" x:Name="ArchiveButton" Content="ZIP / JAR…" Margin="8,0,0,0"/>
+          <Button Grid.Column="3" x:Name="ScanButton" Content="扫描文档" Style="{StaticResource Primary}" Margin="8,0,0,0"/>
+        </Grid>
+        <Grid Grid.Row="2" Margin="0,0,0,13">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <TextBlock x:Name="ScanHint" Text="路径留空时搜索常见安装位置；支持目录及 ZIP/JAR 文档包。" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,0,12,0"/>
+          <CheckBox Grid.Column="1" x:Name="FullScanCheck" Content="扫描所有固定磁盘（较慢）" Foreground="{StaticResource Muted}"/>
+        </Grid>
+        <Grid Grid.Row="3" Margin="0,0,0,9">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <TextBlock x:Name="SelectHeading" Text="02   选择与你的仿真版本对应的文档" Foreground="{StaticResource Ink}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap" Margin="0,0,12,0"/>
+          <TextBlock Grid.Column="1" x:Name="CountLabel" Text="尚未扫描" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+        </Grid>
+        <Grid Grid.Row="4">
+          <DataGrid x:Name="CandidatesGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" HeadersVisibility="Column" GridLinesVisibility="None" BorderBrush="#DEE6EA" Background="White" RowBackground="White" AlternatingRowBackground="#F8FAFB" SelectionMode="Single" SelectionUnit="FullRow" RowHeight="38" HorizontalScrollBarVisibility="Auto">
+            <DataGrid.Columns>
+              <DataGridTextColumn x:Name="FormatColumn" Header="文档模式" Binding="{Binding FormatLabel}" Width="140"/>
+              <DataGridTextColumn x:Name="SourceColumn" Header="来源" Binding="{Binding SourceLabel}" Width="95"/>
+              <DataGridTextColumn x:Name="LocationColumn" Header="文档位置 / 压缩包内目录" Binding="{Binding Location}" Width="*" MinWidth="350"/>
+            </DataGrid.Columns>
+          </DataGrid>
+          <StackPanel x:Name="EmptyPanel" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,25,0,0" IsHitTestVisible="False">
+            <TextBlock x:Name="EmptyTitle" Text="先扫描，再选择文档" Foreground="#617888" FontSize="15" HorizontalAlignment="Center"/>
+            <TextBlock x:Name="EmptyHint" Text="没有安装 STAR-CCM+？也可以选择已有的 Javadoc 压缩包。" Style="{StaticResource Caption}" Margin="12,6,12,0" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"/>
+          </StackPanel>
+        </Grid>
+        <TextBlock Grid.Row="5" x:Name="SelectionHint" Text="选择文档后，可先验证，再接入 Codex。" Style="{StaticResource Caption}" Margin="0,8,0,10" TextWrapping="Wrap"/>
+        <Expander Grid.Row="6" x:Name="AdvancedExpander" Header="高级选项 · 手动指定 Node / Codex 路径" Foreground="{StaticResource Muted}" Margin="0,0,0,12">
+          <Grid Margin="0,10,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="110"/><ColumnDefinition Width="*"/><ColumnDefinition Width="100"/></Grid.ColumnDefinitions>
+            <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+            <TextBlock x:Name="NodeLabel" Text="Node 程序" VerticalAlignment="Center"/><TextBox Grid.Column="1" x:Name="NodeBox" ToolTip="留空自动发现 node.exe"/><Button Grid.Column="2" x:Name="NodeBrowseButton" Content="选择…" Margin="8,0,0,0"/>
+            <TextBlock x:Name="CodexLabel" Grid.Row="1" Text="Codex 程序" VerticalAlignment="Center"/><TextBox Grid.Row="1" Grid.Column="1" x:Name="CodexBox" Margin="0,6,0,0" ToolTip="留空自动发现 codex.exe / codex.cmd / codex.ps1"/><Button Grid.Row="1" Grid.Column="2" x:Name="CodexBrowseButton" Content="选择…" Margin="8,6,0,0"/>
+            <TextBlock x:Name="ServerNameLabel" Grid.Row="2" Text="服务名称" VerticalAlignment="Center"/><TextBox Grid.Row="2" Grid.Column="1" x:Name="ServerNameBox" Text="starccm-javadoc" Margin="0,6,0,0"/>
+          </Grid>
+        </Expander>
+        <Grid Grid.Row="7">
+          <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+          <TextBlock x:Name="InstallHint" Text="首次验证会联网安装所需依赖。" Style="{StaticResource Caption}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,12,0"/>
+          <Button Grid.Column="1" x:Name="VerifyButton" Content="仅验证文档与连接" IsEnabled="False" Margin="0,0,10,0"/>
+          <Button Grid.Column="2" x:Name="DeployButton" Content="验证并接入 Codex" IsEnabled="False" Style="{StaticResource Primary}"/>
+        </Grid>
+      </Grid>
+    </Border>
+    </ScrollViewer>
+    <StackPanel Grid.Row="3" Margin="0,13,0,0">
+      <Grid Margin="0,0,0,7">
+        <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+        <StackPanel><TextBlock x:Name="StatusText" Text="准备就绪" Foreground="{StaticResource Ink}" FontWeight="SemiBold"/><TextBlock x:Name="StatusDetail" Text="扫描不会修改 Codex 配置。" Style="{StaticResource Caption}" Margin="0,3,0,0" TextWrapping="Wrap"/></StackPanel>
+        <Button Grid.Column="1" x:Name="CancelButton" Content="停止扫描" Visibility="Collapsed" Padding="10,5"/>
+      </Grid>
+      <ProgressBar x:Name="Progress" Height="3" IsIndeterminate="False" Value="0" BorderThickness="0" Background="#DEE7EA" Foreground="#007F79" Margin="0,0,0,8"/>
+      <Expander Header="操作日志" x:Name="LogExpander" IsExpanded="False" Foreground="{StaticResource Muted}">
+        <Grid Margin="0,6,0,0">
+          <Grid.RowDefinitions><RowDefinition Height="108"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+          <TextBox x:Name="LogBox" IsReadOnly="True" FontFamily="Consolas" FontSize="11" Background="#EDF1F4" BorderThickness="0" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/>
+          <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,6,0,0">
+            <Button x:Name="CopyLogButton" Content="复制日志" Padding="10,5"/>
+            <Button x:Name="OpenReportButton" Content="打开报告目录 ↗" Padding="10,5" Margin="8,0,0,0" IsEnabled="False"/>
+          </StackPanel>
+        </Grid>
+      </Expander>
+    </StackPanel>
+  </Grid>
+</Window>

@@ -13,3 +13,11 @@ node_modules/
 .claude/settings.local.json
 .claude.json
 
+# Machine-specific deployment files and proprietary documentation.
+local-docs/
+discovery-report.json
+codex-mcp.generated.toml
+*.log
+gui-delivery-path.txt
+
+

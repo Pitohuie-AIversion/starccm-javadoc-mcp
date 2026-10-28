@@ -1,5 +1,7 @@
 # starccm-javadoc-mcp
 
+**Codex desktop edition:** This package includes a bilingual Windows setup application. Start with [English GUI instructions](README-GUI.en.md) or [中文部署说明](README-Codex.zh-CN.md). This edition requires Node.js 20+ and has been tested with Codex in an isolated configuration. The original upstream description follows; its Claude-only testing notes describe the upstream edition.
+
 A small MCP server that lets an AI assistant search and read the Simcenter STAR-CCM+ Java API documentation (Javadoc) that ships with your own installation, so the macros it writes use real, current API calls instead of invented ones. Two tools, `search_api` and `get_doc`, plus the instruments used to measure and reduce what the server costs in tokens.
 
 This repository accompanies two tutorial series published on the Siemens Simcenter community forum. The forum renders client side and is hard to index; this README is the indexable table of contents.
