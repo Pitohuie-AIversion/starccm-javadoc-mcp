@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-node:
+    name: Node.js Tests (${{ matrix.os }}, Node ${{ matrix.node-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node-version: [20, 22]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --omit=dev --ignore-scripts
+
+      - name: Run regression tests
+        run: node scripts/regression-test.mjs
+
+  test-uv-python:
+    name: Python & uv Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+          enable-cache: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build and verify package with uv
+        run: |
+          uv build
+          uv run starccm-javadoc-mcp --help
+          uv run starccm-javadoc-mcp --version
+
+  test-windows-powershell:
+    name: Windows PowerShell & GUI Build Tests
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --omit=dev --ignore-scripts
+
+      - name: Test C# GUI compilation
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\build-gui.ps1
+
+      - name: Run Windows PowerShell 5.1 tests
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\arguments.ps1
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\registration.ps1
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\tests\package-gui.ps1
+
+      - name: Run PowerShell 7 tests
+        run: |
+          pwsh -NoProfile -ExecutionPolicy Bypass -File .\tests\arguments.ps1
+          pwsh -NoProfile -ExecutionPolicy Bypass -File .\tests\registration.ps1
+
+      - name: Verify release packaging
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File .\package-gui.ps1

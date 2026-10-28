@@ -111,7 +111,9 @@ try {
         $matches = @(Find-StarJavadoc -ScanRoots @($archive) | Where-Object { $_.Source -eq 'archive' -and $_.Archive -eq $archive -and $_.Prefix -ceq $prefix })
         if ($matches.Count -ne 1) { throw 'Selected documentation prefix is no longer present in the archive. Scan again.' }
         Write-Host 'Extracting the selected Javadoc folder...'
-        $docRoot = Expand-StarJavadoc -Candidate $matches[0] -Destination (Join-Path $repo 'local-docs')
+        $extractTo = Get-StringField $request 'extractTo' (Join-Path $repo 'local-docs')
+        if (-not [IO.Path]::IsPathRooted($extractTo)) { throw 'extractTo must be an absolute path.' }
+        $docRoot = Expand-StarJavadoc -Candidate $matches[0] -Destination $extractTo
     } else { throw "Unsupported selected candidate source: $source" }
 
     $deployArgs = @{ JavadocRoot = $docRoot; ReportDirectory = $reportDir; ServerName = $serverName }

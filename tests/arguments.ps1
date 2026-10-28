@@ -1,8 +1,9 @@
 #Requires -Version 5.1
 $ErrorActionPreference = 'Stop'
 Import-Module (Join-Path (Split-Path $PSScriptRoot -Parent) 'scripts/Executables.psm1') -Force
+$runtime = Join-Path $env:USERPROFILE '.cache/codex-runtimes/codex-primary-runtime/dependencies/node'
+$node = Find-Executable $null 'node.exe' @((Join-Path $runtime 'bin/node.exe'), (Join-Path $env:ProgramFiles 'nodejs/node.exe'))
 $sandbox = Join-Path $env:TEMP ('starccm-args-' + [guid]::NewGuid().ToString('N'))
-$node = (Get-Command node.exe).Source
 $unicode = [string][char]0x6587 + [string][char]0x6863
 $cases = @('plain', 'amp&docs', 'percent%NAME%', 'bang!NAME!', 'caret^docs', '(docs)', $unicode, 'with spaces', 'A&B%NAME%!^()')
 $values = @($cases) + @('C:\tail\', 'C:\with space\', '')

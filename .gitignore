@@ -20,4 +20,9 @@ codex-mcp.generated.toml
 *.log
 gui-delivery-path.txt
 
-
+# Python and uv build artifacts
+.venv/
+dist/
+__pycache__/
+*.egg-info/
+.uv/

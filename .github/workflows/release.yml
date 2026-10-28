@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-release:
+    name: Build & Publish Release Assets
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci --omit=dev --ignore-scripts
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "latest"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build Windows GUI & Package GUI Release
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\package-gui.ps1 -OutputPath "starccm-javadoc-codex-gui.zip"
+
+      - name: Build Python Distribution Wheels with uv
+        run: |
+          uv build
+
+      - name: Package CLI Distribution
+        run: |
+          $cliFiles = @('LICENSE','README.md','README-Codex.zh-CN.md','README-GUI.en.md','CHECKS.md','package.json','package-lock.json','pnpm-lock.yaml','server.mjs','deploy-codex.ps1')
+          foreach ($folder in @('lib','scripts','tests')) {
+              $cliFiles += Get-ChildItem -LiteralPath (Join-Path $PWD $folder) -File | ForEach-Object { $folder + '/' + $_.Name }
+          }
+          $zip = "starccm-javadoc-codex.zip"
+          Compress-Archive -Path $cliFiles -DestinationPath $zip -Force
+          $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
+          [IO.File]::WriteAllText(($zip + '.sha256'), "$hash  $zip`n")
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            starccm-javadoc-codex-gui.zip
+            starccm-javadoc-codex-gui.zip.sha256
+            starccm-javadoc-codex.zip
+            starccm-javadoc-codex.zip.sha256
+            dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false

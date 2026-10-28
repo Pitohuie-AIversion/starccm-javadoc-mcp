@@ -433,6 +433,7 @@ try {
     if ($script:active -and $script:active.Action -in @('scan','environment')) { Stop-Operation }
     if ($SelfTest) {
         $window.Close()
+        if ($script:fixture -and [IO.Directory]::Exists($script:fixture)) { [IO.File]::WriteAllText((Join-Path $script:fixture '.starccm-test-fixture'), 'Synthetic GUI self-test data. Not Siemens documentation.') }
         if ($script:testConfigHome) { $env:CODEX_HOME = $script:savedConfigHome }
     }
 }

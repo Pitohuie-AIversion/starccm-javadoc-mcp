@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "starccm-javadoc-mcp"
+version = "1.0.0"
+description = "STAR-CCM+ Java API Documentation MCP Server with Windows Codex Auto-Deployment and GUI"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "BSD-3-Clause"
+authors = [
+    { name = "Pitohuie-AIversion" },
+    { name = "pacoEzq" }
+]
+keywords = [
+    "mcp",
+    "model-context-protocol",
+    "star-ccm+",
+    "starccm",
+    "javadoc",
+    "codex",
+    "cfd",
+    "ai"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: BSD License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Pitohuie-AIversion/starccm-javadoc-mcp"
+Repository = "https://github.com/Pitohuie-AIversion/starccm-javadoc-mcp.git"
+Issues = "https://github.com/Pitohuie-AIversion/starccm-javadoc-mcp/issues"
+Changelog = "https://github.com/Pitohuie-AIversion/starccm-javadoc-mcp/releases"
+
+[project.scripts]
+starccm-javadoc-mcp = "starccm_javadoc_mcp.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/starccm_javadoc_mcp"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"server.mjs" = "share/starccm-javadoc-mcp/server.mjs"
+"package.json" = "share/starccm-javadoc-mcp/package.json"
+"lib" = "share/starccm-javadoc-mcp/lib"
+
+[tool.uv]
+managed = true
+package = true

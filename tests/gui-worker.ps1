@@ -20,6 +20,7 @@ function Invoke-TestWorker($Request, [bool]$ShouldSucceed = $true, [string]$Raw 
     if ($Raw) { [IO.File]::WriteAllText($requestPath, $Raw) }
     else {
         $Request.reportDirectory = $runDir
+        $Request.extractTo = Join-Path $sandbox 'extracted-docs'
         [IO.File]::WriteAllText($requestPath, (ConvertTo-Json -InputObject $Request -Depth 8), (New-Object Text.UTF8Encoding($false)))
     }
     $workerLog = & powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File $worker -RequestFile $requestPath -ResultFile $resultPath
@@ -53,6 +54,7 @@ try {
     if (@($archiveScan.candidates).Count -ne 1 -or $archiveScan.candidates[0].Archive -ne $zip -or -not $archiveScan.candidates[0].Prefix) { throw 'Archive identity mismatch.' }
     $archiveVerified = Invoke-TestWorker @{ action = 'verify'; selected = $archiveScan.candidates[0] }
     if ($archiveVerified.selected.Source -ne 'folder' -or -not (Test-Path -LiteralPath $archiveVerified.docRoot)) { throw 'Archive verify did not return extracted root.' }
+    if (-not [IO.Path]::GetFullPath($archiveVerified.docRoot).StartsWith(([IO.Path]::GetFullPath((Join-Path $sandbox 'extracted-docs')) + [IO.Path]::DirectorySeparatorChar), [StringComparison]::OrdinalIgnoreCase)) { throw 'Test extraction escaped its isolated directory.' }
     $stale = $archiveScan.candidates[0]
     $stale.Prefix = 'missing-prefix/'
     $failure = Invoke-TestWorker @{ action = 'verify'; selected = $stale } $false
@@ -70,10 +72,21 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Replacing an existing result failed.' }
     $replacement = Get-Content -LiteralPath $repeatResult -Raw -Encoding UTF8 | ConvertFrom-Json
     if (-not $replacement.ok -or $replacement.PSObject.Properties['stale']) { throw 'Existing result was not atomically replaced.' }
+    [IO.File]::WriteAllText((Join-Path $docs '.starccm-test-fixture'), 'Synthetic test data. Not Siemens documentation.')
+    $excluded = Invoke-TestWorker @{ action = 'scan'; scanRoot = $docs; fullScan = $false }
+    if (@($excluded.candidates).Count -ne 0) { throw 'Marked synthetic documentation was offered for deployment.' }
+    $markedZip = Join-Path $sandbox 'marked-test-docs.zip'
+    [IO.Compression.ZipFile]::CreateFromDirectory($docs, $markedZip)
+    $excludedArchive = Invoke-TestWorker @{ action = 'scan'; scanRoot = $markedZip; fullScan = $false }
+    if (@($excludedArchive.candidates).Count -ne 0) { throw 'Marked synthetic archive was offered for deployment.' }
+    Write-Host 'PASS: marked synthetic folders and archives are excluded from deployment candidates.'
     Invoke-TestWorker @{} $false '{ not JSON' | Out-Null
     Invoke-TestWorker @{ action = 'invalid' } $false | Out-Null
     Invoke-TestWorker @{ action = 'scan'; fullScan = 'true' } $false | Out-Null
     Invoke-TestWorker @{ action = 'deploy' } $false | Out-Null
     Write-Host 'PASS: environment diagnostics and invalid requests return structured errors.'
-} finally { $env:CODEX_HOME = $oldConfigHome }
+} finally {
+    $env:CODEX_HOME = $oldConfigHome
+    [IO.File]::WriteAllText((Join-Path $sandbox '.starccm-test-fixture'), 'Synthetic worker self-test data. Not Siemens documentation.')
+}
 Write-Host "GUI worker test evidence: $sandbox"

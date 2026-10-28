@@ -1,6 +1,18 @@
 # starccm-javadoc-mcp
 
-**Codex desktop edition:** This package includes a bilingual Windows setup application. Start with [English GUI instructions](README-GUI.en.md) or [中文部署说明](README-Codex.zh-CN.md). This edition requires Node.js 20+ and has been tested with Codex in an isolated configuration. The original upstream description follows; its Claude-only testing notes describe the upstream edition.
+**Codex desktop edition:** This package includes a bilingual Windows setup application and `uv`/Python launcher support. Start with [English GUI instructions](README-GUI.en.md) or [中文部署说明](README-Codex.zh-CN.md). This edition requires Node.js 20+ and has been tested with Codex, Claude Code, and Python `uvx`.
+
+### Quick Start with `uv` / `uvx`
+
+If you use Python or `uv`, you can run the server directly without manual git clone or setup:
+
+```bash
+# Run stdio MCP server directly:
+uvx starccm-javadoc-mcp
+
+# Or in a local clone:
+uv run starccm-javadoc-mcp
+```
 
 A small MCP server that lets an AI assistant search and read the Simcenter STAR-CCM+ Java API documentation (Javadoc) that ships with your own installation, so the macros it writes use real, current API calls instead of invented ones. Two tools, `search_api` and `get_doc`, plus the instruments used to measure and reduce what the server costs in tokens.
 

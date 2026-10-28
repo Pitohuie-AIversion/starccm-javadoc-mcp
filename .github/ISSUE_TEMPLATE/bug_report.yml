@@ -1,0 +1,51 @@
+name: Bug Report / 问题反馈
+description: Report an issue with Javadoc scanning, Codex registration, GUI, or MCP tool calls.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting an issue! Please check if the issue is already reported before submitting.
+  - type: input
+    id: starccm-version
+    attributes:
+      label: STAR-CCM+ Version
+      description: What version of STAR-CCM+ are you using (e.g., 2406, 2310, 18.04)?
+      placeholder: "e.g., STAR-CCM+ 2406 (19.04.007)"
+    validations:
+      required: false
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Operating Environment
+      description: Which environment are you running on?
+      options:
+        - Windows 11 (PowerShell 5.1 / 7)
+        - Windows 10
+        - Windows Server
+        - Linux / macOS (stdio MCP only)
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js & Codex Version
+      description: Output of `node --version` and `codex --version` (if applicable)
+      placeholder: "e.g., Node.js v24.2.0, Codex 0.1.x"
+    validations:
+      required: false
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what went wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs / Output
+      description: Copy logs from the GUI operation log or terminal.
+      render: shell

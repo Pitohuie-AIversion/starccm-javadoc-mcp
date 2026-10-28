@@ -8,6 +8,7 @@ function Test-StarJavadoc {
 
 function Get-StarJavadocFormat {
     param([string]$Path)
+    if (Test-Path -LiteralPath (Join-Path $Path '.starccm-test-fixture') -PathType Leaf -ErrorAction SilentlyContinue) { return $null }
     if (-not (Test-Path -LiteralPath (Join-Path $Path 'star/common/Simulation.html') -PathType Leaf -ErrorAction SilentlyContinue)) { return $null }
     if ((Test-Path -LiteralPath (Join-Path $Path 'type-search-index.js') -PathType Leaf -ErrorAction SilentlyContinue) -and
         (Test-Path -LiteralPath (Join-Path $Path 'member-search-index.js') -PathType Leaf -ErrorAction SilentlyContinue)) { return 'indexed' }
@@ -56,6 +57,7 @@ function Get-StarArchiveCandidates {
         foreach ($name in $names) {
             if ($name -match '(^|/)star/common/Simulation\.html$') {
                 $prefix = $name.Substring(0, $name.Length - 'star/common/Simulation.html'.Length)
+                if ($names.Contains($prefix + '.starccm-test-fixture')) { continue }
                 $format = $null
                 if ($names.Contains($prefix + 'type-search-index.js') -and $names.Contains($prefix + 'member-search-index.js')) { $format = 'indexed' }
                 elseif ($names.Contains($prefix + 'star/common/Region.html') -and ($names.Contains($prefix + 'index.html') -or $names.Contains($prefix + 'overview-summary.html'))) { $format = 'html-fallback' }
@@ -86,6 +88,7 @@ function Find-StarJavadoc {
     while ($queue.Count -gt 0) {
         $next = $queue.Dequeue(); $dir = [string]$next[0]; $depth = [int]$next[1]
         if (-not $seen.Add($dir)) { continue }
+        if (Test-Path -LiteralPath (Join-Path $dir '.starccm-test-fixture') -PathType Leaf -ErrorAction SilentlyContinue) { continue }
         $count++
         if ($count % 500 -eq 0) { Write-Progress -Activity 'Scanning for STAR-CCM+ Javadoc' -Status "$count folders: $dir" }
         if (Test-StarJavadoc $dir) {
