@@ -1,17 +1,14 @@
 # starccm-javadoc-mcp
 
-**Codex desktop edition:** This package includes a bilingual Windows setup application and `uv`/Python launcher support. Start with [English GUI instructions](README-GUI.en.md) or [中文部署说明](README-Codex.zh-CN.md). This edition requires Node.js 20+ and has been tested with Codex, Claude Code, and Python `uvx`.
+**Codex desktop edition:** The Windows GUI ZIP includes a bilingual setup application; the CLI ZIP provides PowerShell deployment. Keep the extracted folder intact. Start with the GUI ZIP's `README-GUI.en.md` or [中文部署说明](README-Codex.zh-CN.md). Opening the interface does not require a running Codex session. MCP verification and use require Node.js 20+, installed npm dependencies, and your own STAR-CCM+ Javadoc. Codex registration requires the Codex CLI. See [validation scope](CHECKS.md) for the tests and remaining limitations.
 
-### Quick Start with `uv` / `uvx`
+### Python launcher status
 
-If you use Python or `uv`, you can run the server directly without manual git clone or setup:
+The Python launcher is experimental and is excluded from release assets. The current wheel omits npm dependencies and Windows deployment/GUI files, so it is not a standalone installation and `uvx` is not a verified deployment path. For a local source checkout with Node.js and `uv` already installed, prepare the JavaScript dependencies and supply your document path explicitly:
 
 ```bash
-# Run stdio MCP server directly:
-uvx starccm-javadoc-mcp
-
-# Or in a local clone:
-uv run starccm-javadoc-mcp
+npm ci --omit=dev --ignore-scripts
+uv run starccm-javadoc-mcp /absolute/path/to/javadoc
 ```
 
 A small MCP server that lets an AI assistant search and read the Simcenter STAR-CCM+ Java API documentation (Javadoc) that ships with your own installation, so the macros it writes use real, current API calls instead of invented ones. Two tools, `search_api` and `get_doc`, plus the instruments used to measure and reduce what the server costs in tokens.
@@ -29,8 +26,8 @@ The Javadoc itself is not in this repository and never will be. It is Siemens do
 ## Requirements
 
 - Simcenter STAR-CCM+ with its Javadoc (typically under `<STAR-CCM+ install>\doc\...\client\html`). Measured against 2606 Build 21.04.007; the tool reads any modern Javadoc that ships `type-search-index.js` and `member-search-index.js`.
-- Node.js 18 or newer.
-- Claude Code CLI (the server is registered with `claude mcp add`). Any MCP client that speaks stdio should work; only Claude Code has been tested.
+- Node.js 20 or newer for this edition.
+- A stdio MCP client. This edition tests Codex CLI registration in an isolated configuration; the upstream instructions below cover Claude Code. Real STAR-CCM+ document and Codex chat acceptance remain pending; see `CHECKS.md`.
 
 ## Setup in five steps
 

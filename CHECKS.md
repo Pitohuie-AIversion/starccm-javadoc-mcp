@@ -51,6 +51,16 @@
 
 `tests/executable-timeout.ps1`、参数传递、注册回滚及端到端部署测试在 Windows PowerShell 5.1 / PowerShell 7 下通过。测试中三个启动器的 2 秒超时约 2.02–2.04 秒完成；超时后的配置回滚通过。GUI 子孙进程取消约 18 毫秒完成，无关进程保持运行。`tests/package-gui.ps1` 的六项发布/回滚检查通过。
 
+## Release 打包复查
+
+修复新加入的 GitHub Release 流程：GUI ZIP 输出到源码外的 runner 临时目录，符合打包器约束；CLI ZIP 按相对路径复制到独立暂存目录，保留 `lib`、`scripts` 和 `tests` 层级，避免逐个文件压缩时丢失目录结构。上传缺少附件时失败，带连字符的版本标签会标记为预发布。
+
+在本机直接执行工作流中的两段打包命令成功，GUI 包 33 个文件、CLI 包 20 个文件，附带 SHA-256。CLI 包全新解压、按锁文件安装生产依赖后，MCP 握手、工具枚举、搜索、文档读取及回归检查通过。此记录不代表 GitHub 托管运行器已执行成功。
+
+Python wheel 目前只包含服务入口、package.json 和 lib，没有 npm 依赖准备逻辑，也缺少部署和 GUI 资源；它不具备独立部署条件。本次 Release 不上传 Python 分发包，源码保留实验性启动器；`--help` / `--version` 成功不等同于 MCP 可用。
+
+建议先以 Windows 便携版预发布，使用完整解压目录。EXE 不是包含 Node.js、依赖和文档的单文件离线程序；首次依赖安装需要网络。EXE 当前未进行代码签名。
+
 ## 验证范围
 
 测试使用明确标记的合成文档，并未获得或分发 Siemens 专有 Javadoc。尚未完成真实 STAR-CCM+ 安装版本、Codex 聊天工具调用及宏编译运行的实机验收。

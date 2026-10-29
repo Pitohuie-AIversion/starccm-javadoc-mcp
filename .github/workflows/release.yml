@@ -24,44 +24,49 @@ jobs:
       - name: Install dependencies
         run: npm ci --omit=dev --ignore-scripts
 
-      - name: Setup uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          version: "latest"
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Check MCP server
+        run: node scripts/regression-test.mjs
 
       - name: Build Windows GUI & Package GUI Release
         run: |
-          powershell -NoProfile -ExecutionPolicy Bypass -File .\package-gui.ps1 -OutputPath "starccm-javadoc-codex-gui.zip"
-
-      - name: Build Python Distribution Wheels with uv
-        run: |
-          uv build
+          $releaseDir = Join-Path $env:RUNNER_TEMP 'starccm-release'
+          New-Item -ItemType Directory -Path $releaseDir -Force | Out-Null
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\package-gui.ps1 -OutputPath (Join-Path $releaseDir 'starccm-javadoc-codex-gui.zip')
+          if ($LASTEXITCODE -ne 0) { throw 'GUI packaging failed.' }
 
       - name: Package CLI Distribution
         run: |
-          $cliFiles = @('LICENSE','README.md','README-Codex.zh-CN.md','README-GUI.en.md','CHECKS.md','package.json','package-lock.json','pnpm-lock.yaml','server.mjs','deploy-codex.ps1')
-          foreach ($folder in @('lib','scripts','tests')) {
-              $cliFiles += Get-ChildItem -LiteralPath (Join-Path $PWD $folder) -File | ForEach-Object { $folder + '/' + $_.Name }
+          $releaseDir = Join-Path $env:RUNNER_TEMP 'starccm-release'
+          $stage = Join-Path $env:RUNNER_TEMP ('starccm-cli-' + [guid]::NewGuid().ToString('N'))
+          New-Item -ItemType Directory -Path $stage | Out-Null
+          $cliFiles = @('LICENSE','README.md','README-Codex.zh-CN.md','CHECKS.md','package.json','package-lock.json','pnpm-lock.yaml','server.mjs','deploy-codex.ps1')
+          $cliFiles += @('lib/extract.mjs','lib/javadoc.mjs','scripts/Executables.psm1','scripts/Javadoc.psm1','scripts/Registration.psm1','scripts/regression-test.mjs','scripts/smoke-test.mjs')
+          $cliFiles += @('tests/arguments.ps1','tests/executable-timeout.ps1','tests/registration.ps1','tests/verify.ps1')
+          foreach ($relative in $cliFiles) {
+              $destination = Join-Path $stage $relative
+              New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
+              Copy-Item -LiteralPath (Join-Path $PWD $relative) -Destination $destination
           }
-          $zip = "starccm-javadoc-codex.zip"
-          Compress-Archive -Path $cliFiles -DestinationPath $zip -Force
+          $zip = Join-Path $releaseDir 'starccm-javadoc-codex.zip'
+          [IO.Compression.ZipFile]::CreateFromDirectory($stage, $zip)
+          $archive = [IO.Compression.ZipFile]::OpenRead($zip)
+          try {
+              foreach ($relative in $cliFiles) {
+                  if (-not $archive.GetEntry($relative)) { throw "Missing archive entry: $relative" }
+              }
+          } finally { $archive.Dispose() }
           $hash = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash
-          [IO.File]::WriteAllText(($zip + '.sha256'), "$hash  $zip`n")
+          [IO.File]::WriteAllText(($zip + '.sha256'), "$hash  $([IO.Path]::GetFileName($zip))`n")
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            starccm-javadoc-codex-gui.zip
-            starccm-javadoc-codex-gui.zip.sha256
-            starccm-javadoc-codex.zip
-            starccm-javadoc-codex.zip.sha256
-            dist/*
+            ${{ runner.temp }}/starccm-release/starccm-javadoc-codex-gui.zip
+            ${{ runner.temp }}/starccm-release/starccm-javadoc-codex-gui.zip.sha256
+            ${{ runner.temp }}/starccm-release/starccm-javadoc-codex.zip
+            ${{ runner.temp }}/starccm-release/starccm-javadoc-codex.zip.sha256
+          fail_on_unmatched_files: true
           generate_release_notes: true
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
