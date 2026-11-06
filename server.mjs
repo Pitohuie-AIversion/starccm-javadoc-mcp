@@ -138,16 +138,26 @@ server.registerTool(
     const out = [];
 
     if (kind === "type" || kind === "all") {
-      const rankedTypes = [...types].sort((a, b) => Number(b.name.toLowerCase() === q || `${b.pkg}.${b.name}`.toLowerCase() === q) - Number(a.name.toLowerCase() === q || `${a.pkg}.${a.name}`.toLowerCase() === q));
-      for (const t of rankedTypes) {
-        if (`${t.pkg}.${t.name}`.toLowerCase().includes(q)) {
-          out.push(`[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`);
+      const exact = [];
+      const partial = [];
+      for (const t of types) {
+        const searchStr = `${t.pkg}.${t.name}`;
+        const searchStrLower = searchStr.toLowerCase();
+        if (searchStrLower.includes(q)) {
+          // ⚡ Bolt: O(N) partitioning avoids O(N log N) sorting and redundant string operations
+          const isExact = t.name.toLowerCase() === q || searchStrLower === q;
+          const formatted = `[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`;
+          if (isExact) exact.push(formatted);
+          else partial.push(formatted);
         }
       }
+      out.push(...exact, ...partial);
     }
     if (kind === "member" || kind === "all") {
       for (const m of members) {
-        if (`${m.pkg}.${m.cls}.${m.name}`.toLowerCase().includes(q)) {
+        // ⚡ Bolt: compute lowercase once per member
+        const searchStrLower = `${m.pkg}.${m.cls}.${m.name}`.toLowerCase();
+        if (searchStrLower.includes(q)) {
           out.push(`[member] ${m.pkg ? m.pkg + "." : ""}${m.cls}.${m.name}  ->  ${m.url}`);
         }
       }
