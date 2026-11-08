@@ -1,0 +1,3 @@
+## 2024-03-24 - Accessibility bindings in WPF
+**Learning:** For desktop applications built using WPF, screen reader accessibility (like NVDA or Narrator) must use `AutomationProperties.LabeledBy` and `AutomationProperties.Name` attributes rather than standard HTML ARIA attributes like `aria-label` or `aria-labelledby`. Binding `AutomationProperties.LabeledBy` to the ElementName of an associated TextBlock properly links a visual label with an interactive control.
+**Action:** When adding accessibility properties to XAML-based UI definitions, use `AutomationProperties.LabeledBy="{Binding ElementName=LabelName}"` for textboxes with a visible label element.
