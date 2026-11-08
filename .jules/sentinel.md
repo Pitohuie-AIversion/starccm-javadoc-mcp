@@ -1,0 +1,4 @@
+## 2024-05-18 - Input Bound and Path Leakage in MCP Tools
+**Vulnerability:** Found missing input bounds in MCP tools (`search_api`, `get_doc`), creating a Denial of Service (DoS) risk through excessive payload processing. Additionally, discovered that error messages in `lib/javadoc.mjs` leaked internal server paths (e.g., `Invalid Javadoc search index: /absolute/path/...`).
+**Learning:** Input bounds for string and array parameters must always be strictly defined, especially in server-side contexts. Error messages must sanitize file paths using `path.basename()` or equivalent to prevent Directory Disclosure vulnerabilities.
+**Prevention:** Always validate all parameters with strict `.max()` limits in Zod schemas. Ensure error messages exposed externally never contain absolute directory structures.
