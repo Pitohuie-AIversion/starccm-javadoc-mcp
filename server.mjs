@@ -138,17 +138,31 @@ server.registerTool(
     const out = [];
 
     if (kind === "type" || kind === "all") {
-      const rankedTypes = [...types].sort((a, b) => Number(b.name.toLowerCase() === q || `${b.pkg}.${b.name}`.toLowerCase() === q) - Number(a.name.toLowerCase() === q || `${a.pkg}.${a.name}`.toLowerCase() === q));
-      for (const t of rankedTypes) {
-        if (`${t.pkg}.${t.name}`.toLowerCase().includes(q)) {
-          out.push(`[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`);
+      // ⚡ Bolt Optimization: Filter array first (O(N)) to find matches,
+      // instead of sorting the entire array (O(N log N)) which repeatedly
+      // calculates .toLowerCase() and concatenates strings for non-matches.
+      const matches = [];
+      for (const t of types) {
+        const full = t.pkg ? `${t.pkg}.${t.name}` : t.name;
+        const fullLower = full.toLowerCase();
+        if (fullLower.includes(q)) {
+          const exact = t.name.toLowerCase() === q || fullLower === q;
+          matches.push({ exact, text: `[type]   ${full}  ->  ${t.url}` });
         }
+      }
+      // Sort only the matched subset to bubble exact matches to the top
+      matches.sort((a, b) => Number(b.exact) - Number(a.exact));
+      for (const m of matches) {
+        out.push(m.text);
       }
     }
     if (kind === "member" || kind === "all") {
       for (const m of members) {
-        if (`${m.pkg}.${m.cls}.${m.name}`.toLowerCase().includes(q)) {
-          out.push(`[member] ${m.pkg ? m.pkg + "." : ""}${m.cls}.${m.name}  ->  ${m.url}`);
+        // ⚡ Bolt Optimization: Cache constructed string to avoid re-allocation
+        // per loop iteration, doing string operations only when necessary.
+        const full = m.pkg ? `${m.pkg}.${m.cls}.${m.name}` : `${m.cls}.${m.name}`;
+        if (full.toLowerCase().includes(q)) {
+          out.push(`[member] ${full}  ->  ${m.url}`);
         }
       }
     }
