@@ -1,0 +1,3 @@
+## 2023-11-09 - Avoid O(N log N) Sorting Before Filtering Array
+**Learning:** In `server.mjs`, when performing search on a large collection (like Javadoc types/members), filtering the array first in O(N) time avoids doing O(N log N) expensive operations (like string concatenation and `toLowerCase()`) inside a `Array.prototype.sort()` comparator for thousands of elements that don't even match the query.
+**Action:** Always filter large arrays first to narrow down the dataset before applying expensive `.sort()` operations, especially when sorting relies on derived properties or strings that aren't natively cached.
