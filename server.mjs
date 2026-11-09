@@ -138,16 +138,23 @@ server.registerTool(
     const out = [];
 
     if (kind === "type" || kind === "all") {
-      const rankedTypes = [...types].sort((a, b) => Number(b.name.toLowerCase() === q || `${b.pkg}.${b.name}`.toLowerCase() === q) - Number(a.name.toLowerCase() === q || `${a.pkg}.${a.name}`.toLowerCase() === q));
-      for (const t of rankedTypes) {
-        if (`${t.pkg}.${t.name}`.toLowerCase().includes(q)) {
-          out.push(`[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`);
+      const exact = [];
+      const partial = [];
+      for (const t of types) {
+        const nameLower = t.name.toLowerCase();
+        const fullLower = `${t.pkg}.${t.name}`.toLowerCase();
+        if (fullLower.includes(q)) {
+          const str = `[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`;
+          if (nameLower === q || fullLower === q) exact.push(str);
+          else partial.push(str);
         }
       }
+      out.push(...exact, ...partial);
     }
     if (kind === "member" || kind === "all") {
       for (const m of members) {
-        if (`${m.pkg}.${m.cls}.${m.name}`.toLowerCase().includes(q)) {
+        const fullLower = `${m.pkg}.${m.cls}.${m.name}`.toLowerCase();
+        if (fullLower.includes(q)) {
           out.push(`[member] ${m.pkg ? m.pkg + "." : ""}${m.cls}.${m.name}  ->  ${m.url}`);
         }
       }
