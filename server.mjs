@@ -126,9 +126,10 @@ server.registerTool(
       "so a missing subclass in the results does not mean the method is unavailable there; " +
       "get_doc on the subclass page lists its inherited members and their declaring classes.",
     inputSchema: {
-      query: z.string().trim().min(1).describe("Class/member name or qualified name, e.g. 'star.common.Simulation' or 'Simulation.getRegionManager'"),
+      // 🛡️ Sentinel: Added length limits to prevent DoS via unbounded input processing
+      query: z.string().trim().min(1).max(256).describe("Class/member name or qualified name, e.g. 'star.common.Simulation' or 'Simulation.getRegionManager'"),
       kind: z.enum(["type", "member", "all"]).optional().describe("Restrict to types, members, or both (default: all)"),
-      limit: z.number().int().positive().optional().describe("Maximum number of results (default 25)")
+      limit: z.number().int().positive().max(1000).optional().describe("Maximum number of results (default 25)")
     }
   },
   async ({ query, kind = "all", limit = 25 }) => {
@@ -179,8 +180,9 @@ server.registerTool(
       "Return the readable text of a STAR-CCM+ Javadoc page (typically a class page) so you can see its method " +
       "signatures and descriptions. Pass the relative path returned by search_api, e.g. 'star/common/Simulation.html'.",
     inputSchema: {
-      docPath: z.string().describe("Relative HTML path under the Javadoc root, e.g. 'star/common/Simulation.html'"),
-      maxChars: z.number().int().positive().optional().describe("Maximum characters to return (default 50000)")
+      // 🛡️ Sentinel: Added length limits to prevent DoS via unbounded input processing
+      docPath: z.string().max(2048).describe("Relative HTML path under the Javadoc root, e.g. 'star/common/Simulation.html'"),
+      maxChars: z.number().int().positive().max(500000).optional().describe("Maximum characters to return (default 50000)")
     }
   },
   async ({ docPath, maxChars = 50000 }) => {
