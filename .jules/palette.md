@@ -1,0 +1,3 @@
+## 2024-05-19 - WPF TextBlock Label Accessibility
+**Learning:** In WPF UI configurations (like `gui/MainWindow.xaml`), standard `TextBox` elements accompanied by `TextBlock` elements (rather than standard `Label` controls) need explicit `AutomationProperties.LabeledBy="{Binding ElementName=LabelName}"` attributes for proper screen reader accessibility. HTML `aria-label`/`htmlFor` isn't applicable.
+**Action:** When working on WPF interfaces, always explicitly bind `TextBlock` labels to their respective inputs using `AutomationProperties.LabeledBy` to ensure screen readers correctly announce the input's purpose.
