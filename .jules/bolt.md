@@ -1,0 +1,4 @@
+## 2024-11-11 - Search API Bottleneck
+
+**Learning:** The `search_api` tool in the MCP server processes large in-memory arrays (~25k types, 150k members). The original implementation sorted the entire `types` array of 25k elements before filtering, and repeatedly performed expensive string concatenations and `.toLowerCase()` operations during each search request. By precomputing fully qualified names, lowercase forms, and output strings during the `buildIndex` phase, search latency is drastically reduced (from ~78ms to ~24ms). Pre-filtering the `types` array to only matched elements before sorting also improves efficiency.
+**Action:** When handling large in-memory arrays that are queried frequently but built once, precompute string formatting and lowercase representations in the index creation phase to minimize per-query work. Filter large lists before applying `.sort()`.

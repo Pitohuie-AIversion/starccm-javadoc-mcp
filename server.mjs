@@ -103,6 +103,21 @@ async function buildIndex() {
     }
   }
 
+  // ⚡ Bolt: Precompute lowercased fully qualified names and output strings
+  // to avoid repeated string allocation and toLowerCase() calls during search queries.
+  for (const t of types) {
+    const fqn = t.pkg ? `${t.pkg}.${t.name}` : t.name;
+    t.fqnL = fqn.toLowerCase();
+    t.nameL = t.name.toLowerCase();
+    t.out = `[type]   ${fqn}  ->  ${t.url}`;
+  }
+
+  for (const m of members) {
+    const fqn = m.pkg ? `${m.pkg}.${m.cls}.${m.name}` : `${m.cls}.${m.name}`;
+    m.fqnL = fqn.toLowerCase();
+    m.out = `[member] ${fqn}  ->  ${m.url}`;
+  }
+
   const warning = !docs.members
     ? 'Member search index is unavailable. This documentation supports class lookup and get_doc; a missing method result does NOT mean that the API is absent. Read its class page and inherited members.'
     : 'Members are indexed under their declaring class. For inherited methods, read the subclass and declaring-class documentation.';
@@ -138,17 +153,25 @@ server.registerTool(
     const out = [];
 
     if (kind === "type" || kind === "all") {
-      const rankedTypes = [...types].sort((a, b) => Number(b.name.toLowerCase() === q || `${b.pkg}.${b.name}`.toLowerCase() === q) - Number(a.name.toLowerCase() === q || `${a.pkg}.${a.name}`.toLowerCase() === q));
-      for (const t of rankedTypes) {
-        if (`${t.pkg}.${t.name}`.toLowerCase().includes(q)) {
-          out.push(`[type]   ${t.pkg ? t.pkg + "." : ""}${t.name}  ->  ${t.url}`);
+      // ⚡ Bolt: Filter types BEFORE sorting to avoid O(N log N) on 25k+ elements.
+      // Use precomputed lowercased strings to avoid repeated string manipulation.
+      const matchedTypes = [];
+      for (const t of types) {
+        if (t.fqnL.includes(q)) {
+          const isExact = t.nameL === q || t.fqnL === q;
+          matchedTypes.push({ t, isExact });
         }
       }
+      matchedTypes.sort((a, b) => Number(b.isExact) - Number(a.isExact));
+      for (const m of matchedTypes) {
+        out.push(m.t.out);
+      }
     }
+
     if (kind === "member" || kind === "all") {
       for (const m of members) {
-        if (`${m.pkg}.${m.cls}.${m.name}`.toLowerCase().includes(q)) {
-          out.push(`[member] ${m.pkg ? m.pkg + "." : ""}${m.cls}.${m.name}  ->  ${m.url}`);
+        if (m.fqnL.includes(q)) {
+          out.push(m.out);
         }
       }
     }
